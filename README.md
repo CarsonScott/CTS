@@ -1,4 +1,4 @@
-# Constraint-Based Type Systems
+# Constraint-Based Type System
 
 CTS is a python library for scaleable, constraint-based definitions of data types.
 
