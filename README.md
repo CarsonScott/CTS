@@ -13,3 +13,5 @@ Constraint functions are distinguished as either base constraints or composite c
 ![Constraints](https://github.com/CarsonScott/CTS/blob/master/img/constraint_hierarchy.PNG)
 
 Constraints may also be defined symbolically using a formal language, providing a method in which a system can scale in real-time via construction of sentences, or strings that conform to the rules of a given language and can be translated by an interpreter into a constraint function. Alternatively, any given constraint function can be translated into a sentence, resulting in a string that, when passed to an interpreter, yields the same constraint function that was originally used to derive the sentence.
+
+![Interpreter](https://github.com/CarsonScott/CTS/blob/master/img/Interpreter.PNG)
