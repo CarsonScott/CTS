@@ -20,8 +20,5 @@ The second requirement is the ability to make connections between parts of a sen
 
 The last requirement is the ability to distinguish whether a given sentence follows a set of combination rules, or specific ways in which the symbols of a sentence are arranged. More specifically, there must be a set of rules for determining how the various constraint symbols and grammar symbols may relate to one another in a sentence, in order for the interpreter to successfully rewrite the sentence as a constraint function. This is the final step in converting a sentence, as well as the most important property of a formal language in this context. If the interpreter attempts to convert a sentence that does not conform to the combination rules, the resulting function is likely not to operate in the way it was meant to, leading to error in future applications of the constraint, as well as structural problems that could potentially prevent the system from executing.
 
-
-__Frames and Interpretation__
-
 Frames are objects that convey descriptive information about other objects to an interpreter. Every interpreter has the ability to process information described in a frame via rules that are predefined and dictate the computational steps taken by the interpreter when given a frame. Instructional frames are unique in that they provide descriptions of rules that, when received by an interpreter, can direct its actions to achieve some desired output. Due to the malleability of their functional characteristics, interpreters can meet the requirements of a  formal language through the application of instructional frames to direct its actions when processing an input.
 
