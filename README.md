@@ -1,7 +1,5 @@
 # Constraint-Based Type System
 
-CTS is a python library for scaleable, constraint-based definitions of data types.
-
 __Introduction and Overview__
 
 A Constraint-based type system is a method of defining data types in terms of the conditions and requirements that a given value must meet in order to be considered a valid instance of a specific type. Each variable has a set of constraints, a set of weights, and a threshold, along with its value at any given time. For a value to be accepted by a variable, the sum of weighted outputs from each of the constraint functions associated with the variable must reach its threshold. Constraints are defined as functions that return a truth value for a given input, which in this case is the value held by a certain variable at a given time.
