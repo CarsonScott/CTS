@@ -1,14 +1,16 @@
 from Functions import *
 
-def UNI(values, proposition=None):
-	if proposition == None: X = values
-	else: X = xcall(proposition, values)
-	return False not in X
+class UNI:
+	def __init__(self, proposition):
+		self.proposition = proposition
+	def __call__(self, values):
+		return uquantifier(xcall(self.proposition, values))
 
-def EXI(values, proposition=None):
-	if proposition == None: X = values
-	else: X = xcall(proposition, values)
-	return True in X
+class EXI:
+	def __init__(self, proposition):
+		self.proposition = proposition
+	def __call__(self, values):
+		return equantifier(xcall(self.proposition, values))
 
 class NOT:
 	def __init__(self, function):
@@ -20,13 +22,13 @@ class AND:
 	def __init__(self, functions):
 		self.functions = functions
 	def __call__(self, value):
-		return UNI(fcall(self.functions, value))
+		return UNI(istrue)(fcall(self.functions, value))
 
 class OR:
 	def __init__(self, functions):
 		self.functions = functions
 	def __call__(self, value):
-		return EXI(fcall(self.functions, value))
+		return EXI(istrue)(fcall(self.functions, value))
 
 class EQ:
 	def __init__(self, value):

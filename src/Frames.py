@@ -1,14 +1,17 @@
 from Operations import *
 
 class Frame(dict):
+
 	def __init__(self, type):
 		self['type'] = type
 
 	def __call__(self, input):
 		frame = self
+		
 		T = frame['type']
 		if T == 'truth':
 			frame = frame['value']
+
 		elif T == 'Function':
 			D = frame['def']
 			frame = Truth(D(input))
@@ -17,6 +20,7 @@ class Frame(dict):
 			X = frame['input']
 			F = frame['function']
 			frame = Truth(F(X))
+
 		elif T == 'proposition':
 			F = frame['function']
 			frame = Operation(F, input)
@@ -25,13 +29,16 @@ class Frame(dict):
 			P = frame['propositions']
 			F = Function(AND(P))
 			frame = Operation(F, input)
+
 		elif T == 'disjunction':
 			P = frame['propositions']
 			F = Function(OR(P))
 			frame = Operation(F, input)
 
+		print(frame)	
 		if not isinstance(frame, bool):
 			frame = frame(input)
+		
 		return frame
 
 def Function(definition):
