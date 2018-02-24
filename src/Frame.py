@@ -12,11 +12,11 @@ def Operation(function, input):
 	f = Frame('operation')
 	f['function'] = function
 	f['input'] = input
-
 	return f
-def Proposition(index):
+
+def Proposition(function):
 	f = Frame('proposition')
-	f['index'] = index
+	f['function'] = function
 	return f
 
 def Conjunction(propositions):
