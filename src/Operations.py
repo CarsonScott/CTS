@@ -1,4 +1,4 @@
-from Functions import fcall
+from Functions import *
 
 def UNI(values, proposition=None):
 	if proposition == None: X = values
