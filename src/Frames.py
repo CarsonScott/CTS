@@ -7,7 +7,6 @@ class Frame(dict):
 
 	def __call__(self, input):
 		frame = self
-		
 		T = frame['type']
 		if T == 'truth':
 			frame = frame['value']
@@ -35,40 +34,37 @@ class Frame(dict):
 			F = Function(OR(P))
 			frame = Operation(F, input)
 
-		print(frame)	
 		if not isinstance(frame, bool):
 			frame = frame(input)
-		
 		return frame
 
-def Function(definition):
-	f = Frame('function')
-	f['def'] = definition
-	return f
-
 def Operation(function, input):
-	f = Frame('operation')
-	f['function'] = function
-	f['input'] = input
-	return f
+	frame = Frame('operation')
+	frame['function'] = function
+	frame['input'] = input
+	return frame
+
+def Function(definition):
+	frame = Frame('function')
+	frame['def'] = definition
+	return frame
 
 def Proposition(function):
-	f = Frame('proposition')
-	f['function'] = function
-	return f
+	frame = Frame('proposition')
+	frame['function'] = function
+	return frame
 
 def Conjunction(propositions):
-	f = Frame('conjunction')
-	f['propositions'] = propositions
-	return f
+	frame = Frame('conjunction')
+	frame['propositions'] = propositions
+	return frame
 
 def Disjunction(propositions):
-	f = Frame('disjunction')
-	f['propositions'] = propositions
-	return f
+	frame = Frame('disjunction')
+	frame['propositions'] = propositions
+	return frame
 
 def Truth(value):
-	f = Frame('truth')
-	f['value'] = value
-	return f
-
+	frame = Frame('truth')
+	frame['value'] = value
+	return frame
