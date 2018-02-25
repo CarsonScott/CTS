@@ -1,0 +1,4 @@
+PROPOSITIONAL CONNECTIVES
+
+	- Connectives that relate multiple propositions to each other by computing their truth values and applying a proposition over the set.
+	- Provides a method of defining propositions using sets of lower propositions, yielding a proposition hierarchy.

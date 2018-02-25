@@ -1,82 +1,82 @@
 from Frame import *
 from Functions import *
 
-class LanguageFrame(Frame):
-
-	def __call__(self, input, language=None):
-		frame = self
-
-		T = frame['type']
-		if T == 'sentence':
-			language = frame['language']
-			R = language['structure']
-			M = mark(input, R)
-			frame = Demarcation(M)
-
-		elif T == 'demarcation':
-			M = frame['markers']
-			O = define(M)
-			frame = Definition(O)
-
-		elif T == 'definition':
-			O = frame['objects']
-			E = compose(O)
-			frame = Composition(E)
-
-		elif T == 'composition':
-			E = frame['elements']
-			C = construct(input, E)
-			frame = Model(C[len(C)-1])
-
-		if frame['type'] != 'model':
-			frame = frame(input, language)
-		return frame
-
-def Demarcation(markers):
-	frame = LanguageFrame('demarcation')
-	frame['markers'] = markers
+def Object(oclass, index, children):
+	frame = Frame('object')
+	frame['class'] = oclass
+	frame['index'] = index
+	frame['children'] = children
 	return frame
 
-def Definition(objects):
-	frame = LanguageFrame('definition')
-	frame['objects'] = objects
-	return frame
+class Interpreter:
 
-def Composition(elements):
-	frame = LanguageFrame('composition')
-	frame['elements'] = elements
-	return frame
+	def __init__(self, structural, functional, rules):
+		self.structural = structural
+		self.functional = functional
+		self.rules = rules
 
-def Sentence(language):
-	frame = LanguageFrame('sentence')
-	frame['language'] = language
-	return frame
+	def compute(self, object, structure):
+		P = structure['parents']
+		I = object['index']
+		if I in P:
+			Y = [I]
+			C = object['children']
+			for child in C:
+				V = self.compute(child, structure)
+				if V != None: return Y + V
+			return [I]
+		return None
 
-def Model(composition):
-	frame = LanguageFrame('model')
-	frame['data'] = composition
-	return frame
+	def append(self, tree, object, directory):
+		O = tree
+		history = list()
+		indices = list()
+		for i in range(1, len(directory)):
+			children = O['children']	
+			for j in range(len(children)):
+				if children[j]['index'] == directory[i]:
+					history.append(O)
+					indices.append(j)
+					O = children[j]
+					break
+		O['children'].append(object)
+		for i in range(len(history)-1, -1, -1):
+			history[i]['children'][indices[i]] = O
+			O = history[i]
+			del history[i]
+		return O
 
-def Language(structure_symbols, function_symbols):
-	frame = Frame('language')
-	frame['structure'] = structure_symbols
-	frame['function'] = function_symbols
-	return frame
+	def __call__(self, sentence):
+		components = define(mark(sentence, self.structural))
+		operations = define(mark(sentence, self.functional))
+		model = create(components + operations)
+		
+		functions = []
+		structures = []
+		for i in range(len(model)):
+			O = model[i]
+			if O['class'] == self.rules['structure']['name']:
+				structures.append(O)
+			else: functions.append(O)
 
-# def Definition(string):
-# 	frame = LanguageFrame('definition')
-# 	frame['string'] = string
-# # 	return frame
+		tree = None
+		for i in range(len(structures)-1, -1, -1):
+			P = structures[i]['parents']
+			if tree == None and len(P) == 0:
+				tree = Object(structures[i]['class'], i, list())
+			else:
+				directory = self.compute(tree, structures[i])
+				X = Object(structures[i]['class'], i, list())
+				tree = self.append(tree, X, directory)
 
-# def Boundary(initial, final):
-# 	frame = LanguageFrame('boundary')
-# 	frame['start'] = initial
-# 	frame['end'] = final
-# 	return frame
-
-# def Template(name, sign):
-# 	frame = LanguageFrame('template')
-# 	frame['name'] = name
-# 	frame['sign'] = sign
-# 	return frame
+		for i in range(len(functions)-1, -1, -1):
+			P = functions[i]['parents']
+			if tree == None and len(P) == 0:
+				index = i
+				clss = functions[i]['class']
+				tree = Object(clss, index, list())
+			else:
+				directory = self.compute(tree, functions[i])
+				tree = self.append(tree, functions[i], directory)
+		return tree
 

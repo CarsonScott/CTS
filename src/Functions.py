@@ -69,43 +69,50 @@ def define(boundaries):
 	for i in range(len(boundaries)):
 		label, index = boundaries[i]
 		if label[0] == '/':
-			if match(history[len(history)-1], label):
-				C = history[len(history)-1]
-				D = (indices[len(indices)-1], index)
-				del history[len(history)-1]
-				del indices[len(indices)-1]	
-				objects.append((C, D))
+			if label[len(label)-1] != '/':
+				if match(history[len(history)-1], label):
+					C = history[len(history)-1]
+					D = (indices[len(indices)-1], index)
+					del history[len(history)-1]
+					del indices[len(indices)-1]	
+					objects.append((C, D))
+			else:
+				label = label[1:len(label)-1]
+				C = label
+				D = (index, index)
+				objects.append((C,D))
 		else:
 			history.append(label)
 			indices.append(index)
 	return objects
 
-def compose(objects):
+def create(objects):
 	relations = []
 	for i in range(len(objects)):
 		for j in range(i, len(objects)):
 			if i != j:
 				Ri = objects[i][1]
 				Rj = objects[j][1]
-
 				if contains(Ri, Rj):
-					relations.append((i,j))
+					relations.append((i, j))
 				elif contains(Rj, Ri):
-					relations.append((j,i))
+					relations.append((j, i))
+
 	outputs = []
 	for i in range(len(objects)):
 		symbol = objects[i][0]
 		domain = objects[i][1]
-		indices = children(i, relations)
-		outputs.append([symbol, domain, indices])
+		indices = parents(i, relations)
+		outputs.append({'class':symbol, 'domain':domain, 'parents':indices})
 	return outputs
 
 class Structure(dict):
-	def __init__(self, type, value):
+	def __init__(self, type, value, domain):
 		self['type'] = type
 		self['data'] = value
+		self['domain'] = domain
 
-def construct(sentence, objects, ):
+def construct(sentence, objects):
 	requirements = []
 	outputs = objects
 	for i in range(len(objects)):
@@ -114,8 +121,11 @@ def construct(sentence, objects, ):
 			
 			if len(elements) == 0:
 				start, end = objects[i][1]
-				value = substring(sentence, start+1, end)
-				outputs[i] = Structure('model', value)
+				if start == end:
+					value = sentence[start]
+				else:
+					value = substring(sentence, start+1, end)
+				outputs[i] = Structure('model', value, (start,end))
 			else:
 				unassigned = []
 				for j in range(len(elements)):
@@ -130,7 +140,8 @@ def construct(sentence, objects, ):
 				
 				if len(unassigned) == 0:
 					values = outputs[i][2]
-					outputs[i] = Structure('model', values)
+					domain = outputs[i][1]
+					outputs[i] = Structure('model', values, domain)
 
 	if len(requirements) > 0:
 		outputs = construct(sentence, outputs)
