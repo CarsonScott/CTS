@@ -1,17 +1,5 @@
 from Functions import *
 
-class UNI:
-	def __init__(self, proposition):
-		self.proposition = proposition
-	def __call__(self, values):
-		return uquantifier(xcall(self.proposition, values))
-
-class EXI:
-	def __init__(self, proposition):
-		self.proposition = proposition
-	def __call__(self, values):
-		return equantifier(xcall(self.proposition, values))
-
 class NOT:
 	def __init__(self, function):
 		self.function = function
@@ -22,13 +10,13 @@ class AND:
 	def __init__(self, functions):
 		self.functions = functions
 	def __call__(self, value):
-		return UNI(istrue)(fcall(self.functions, value))
+		return UN(istrue)(fcall(self.functions, value))
 
 class OR:
 	def __init__(self, functions):
 		self.functions = functions
 	def __call__(self, value):
-		return EXI(istrue)(fcall(self.functions, value))
+		return EX(istrue)(fcall(self.functions, value))
 
 class EQ:
 	def __init__(self, value):
@@ -53,3 +41,15 @@ class IN:
 		self.values = values
 	def __call__(self, value):
 		return value in self.values
+
+class UN:
+	def __init__(self, function):
+		self.function = function
+	def __call__(self, values):
+		return uquantifier(xcall(self.function, values))
+
+class EX:
+	def __init__(self, function):
+		self.function = function
+	def __call__(self, values):
+		return equantifier(xcall(self.function, values))

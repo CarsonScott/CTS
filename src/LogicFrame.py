@@ -1,16 +1,15 @@
+from Frame import *
 from Operations import *
 
-class Frame(dict):
-
-	def __init__(self, type):
-		self['type'] = type
-
+class LogicFrame(Frame):
+	
 	def __call__(self, input):
 		frame = self
+
 		T = frame['type']
 		if T == 'truth':
 			frame = frame['value']
-
+	
 		elif T == 'Function':
 			D = frame['def']
 			frame = Truth(D(input))
@@ -34,37 +33,37 @@ class Frame(dict):
 			F = Function(OR(P))
 			frame = Operation(F, input)
 
-		if not isinstance(frame, bool):
+		if isinstance(frame, LogicFrame):
 			frame = frame(input)
 		return frame
 
 def Operation(function, input):
-	frame = Frame('operation')
+	frame = LogicFrame('operation')
 	frame['function'] = function
 	frame['input'] = input
 	return frame
 
 def Function(definition):
-	frame = Frame('function')
+	frame = LogicFrame('function')
 	frame['def'] = definition
 	return frame
 
 def Proposition(function):
-	frame = Frame('proposition')
+	frame = LogicFrame('proposition')
 	frame['function'] = function
 	return frame
 
 def Conjunction(propositions):
-	frame = Frame('conjunction')
+	frame = LogicFrame('conjunction')
 	frame['propositions'] = propositions
 	return frame
 
 def Disjunction(propositions):
-	frame = Frame('disjunction')
+	frame = LogicFrame('disjunction')
 	frame['propositions'] = propositions
 	return frame
 
 def Truth(value):
-	frame = Frame('truth')
+	frame = LogicFrame('truth')
 	frame['value'] = value
 	return frame
