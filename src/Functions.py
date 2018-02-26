@@ -70,6 +70,7 @@ def split(string, indices):
 		previous = current
 	return strings
 
+
 def mark(sentence, vocabulary):
 	markers = []
 	for i in range(len(sentence)):
@@ -85,6 +86,7 @@ def define(boundaries):
 	objects = []
 	for i in range(len(boundaries)):
 		label, index = boundaries[i]
+		print(index)
 		if label[0] == '/':
 			if label[len(label)-1] != '/':
 				if match(history[len(history)-1], label):
@@ -92,12 +94,12 @@ def define(boundaries):
 					D = (indices[len(indices)-1], index)
 					del history[len(history)-1]
 					del indices[len(indices)-1]	
-					objects.append((C, D))
+					objects.append([C, D, 'structure'])
 			else:
 				label = label[1:len(label)-1]
 				C = label
-				D = (index, index)
-				objects.append((C,D))
+				D = (index-len(C), index)
+				objects.append([C, D, 'function'])
 		else:
 			history.append(label)
 			indices.append(index)
@@ -110,6 +112,7 @@ def create(objects):
 			if i != j:
 				Ri = objects[i][1]
 				Rj = objects[j][1]
+				print(Ri, Rj)
 				if contains(Ri, Rj):
 					relations.append((i, j))
 				elif contains(Rj, Ri):
@@ -118,47 +121,62 @@ def create(objects):
 	for i in range(len(objects)):
 		symbol = objects[i][0]
 		domain = objects[i][1]
+		type = objects[i][2]
 		indices = parents(i, relations)
-		outputs.append({'class':symbol, 'domain':domain, 'parents':indices})
+		outputs.append({'type':type, 'class':symbol, 'domain':domain, 'parents':indices})
 	return outputs
 
-class Structure(dict):
-	def __init__(self, type, value, domain):
-		self['type'] = type
-		self['data'] = value
-		self['domain'] = domain
+def convert(sentence, frame, vocabulary):
+	T = frame['type']
+	if T == 'function':
+		function = vocabulary[frame['class']]
+		return {'type':'function', 'data':function}
 
-def construct(sentence, objects):
-	requirements = []
-	outputs = objects
-	for i in range(len(objects)):
-		if not isinstance(objects[i], Structure):
-			elements = objects[i][2]
+	if T == 'structure':
+		children = frame['children']
+		for i in range(len(children)):
+			children[i] = convert(sentence, children[i], vocabulary)
+		frame['children'] = children
+	return frame
+
+
+# class Structure(dict):
+# 	def __init__(self, type, value, domain):
+# 		self['type'] = type
+# 		self['data'] = value
+# 		self['domain'] = domain
+
+# def construct(sentence, objects):
+# 	requirements = []
+# 	outputs = objects
+# 	for i in range(len(objects)):
+# 		if not isinstance(objects[i], Structure):
+# 			elements = objects[i][2]
 			
-			if len(elements) == 0:
-				start, end = objects[i][1]
-				if start == end:
-					value = sentence[start]
-				else:
-					value = substring(sentence, start+1, end)
-				outputs[i] = Structure('model', value, (start,end))
-			else:
-				unassigned = []
-				for j in range(len(elements)):
-					if not isinstance(elements[j], Structure):
-						object = objects[elements[j]]
-						if isinstance(object, Structure):
-							elements[j] = object
-						else:
-							unassigned.append(j)
-				requirements.append(unassigned)
-				outputs[i][2] = elements
+# 			if len(elements) == 0:
+# 				start, end = objects[i][1]
+# 				if start == end:
+# 					value = sentence[start]
+# 				else:
+# 					value = substring(sentence, start+1, end)
+# 				outputs[i] = Structure('model', value, (start,end))
+# 			else:
+# 				unassigned = []
+# 				for j in range(len(elements)):
+# 					if not isinstance(elements[j], Structure):
+# 						object = objects[elements[j]]
+# 						if isinstance(object, Structure):
+# 							elements[j] = object
+# 						else:
+# 							unassigned.append(j)
+# 				requirements.append(unassigned)
+# 				outputs[i][2] = elements
 				
-				if len(unassigned) == 0:
-					values = outputs[i][2]
-					domain = outputs[i][1]
-					outputs[i] = Structure('model', values, domain)
+# 				if len(unassigned) == 0:
+# 					values = outputs[i][2]
+# 					domain = outputs[i][1]
+# 					outputs[i] = Structure('model', values, domain)
 
-	if len(requirements) > 0:
-		outputs = construct(sentence, outputs)
-	return outputs
+# 	if len(requirements) > 0:
+# 		outputs = construct(sentence, outputs)
+# 	return outputs
