@@ -8,19 +8,20 @@ class Frame(dict):
 
 	def __call__(self, input):
 		frame = self
-
 		T = frame['type']
-		if T == 'truth':
-			frame = frame['value']
+
+		if T == 'value':
+			return frame['value']
 	
 		elif T == 'Function':
-			D = frame['def']
-			frame = Truth(D(input))
+			D = frame['definition']
+			frame = Value(D(input))
 
 		elif T == 'operation':
 			X = frame['input']
 			F = frame['function']
-			frame = Truth(F(X))
+			# frame = Truth(F(X))
+			frame = Value(F(X))
 
 		elif T == 'proposition':
 			F = frame['function']
@@ -36,37 +37,37 @@ class Frame(dict):
 			F = Function(OR(P))
 			frame = Operation(F, input)
 
-		if isinstance(frame, LogicFrame):
+		if isinstance(frame, Frame):
 			frame = frame(input)
 		return frame
 
 def Operation(function, input):
-	frame = LogicFrame('operation')
+	frame = Frame('operation')
 	frame['function'] = function
 	frame['input'] = input
 	return frame
 
 def Function(definition):
-	frame = LogicFrame('function')
-	frame['def'] = definition
+	frame = Frame('function')
+	frame['definition'] = definition
 	return frame
 
 def Proposition(function):
-	frame = LogicFrame('proposition')
+	frame = Frame('proposition')
 	frame['function'] = function
 	return frame
 
 def Conjunction(propositions):
-	frame = LogicFrame('conjunction')
+	frame = Frame('conjunction')
 	frame['propositions'] = propositions
 	return frame
 
 def Disjunction(propositions):
-	frame = LogicFrame('disjunction')
+	frame = Frame('disjunction')
 	frame['propositions'] = propositions
 	return frame
 
-def Truth(value):
-	frame = LogicFrame('truth')
+def Value(value):
+	frame = Frame('value')
 	frame['value'] = value
 	return frame

@@ -2,6 +2,29 @@ from Frame import *
 from Functions import *
 from Operations import *
 
+class System:
+	def __init__(self, variables, functions, operations):
+		var = dict()
+		for v in variables:
+			var[v] = None 
+		variables = var
+
+		fun = dict()
+		for i in range(len(functions)):
+			f = functions[i]
+			o = operations[i]
+			fun[f] = o 
+		functions = fun
+
+		self.variables = variables
+		self.functions = functions
+
+	def getvariable(self, name):
+		return self.variables[name]
+
+	def getfunction(self, name):
+		return self.functions[name]
+
 def Object(T, N, I, C):
 	frame = Frame(T)
 	frame['class'] = N
@@ -11,20 +34,15 @@ def Object(T, N, I, C):
 
 class Interpreter:
 
-	def __init__(self, structural, functional, rules):
-		self.structural = structural
-		self.functional = functional
-		self.rules = rules
-		self.variables = []
-		self.functions = []
-
+	def __init__(self, F, V):
+		self.system = F
+		self.variables = V
 	def compute(self, object, input):
 		P = input['parents']
 		I = object['index']
 		if I in P:
 			Y = [I]
 			C = object['children']
-			print(I)
 			for child in C:
 				V = self.compute(child, input)
 				if V != []: return Y + V
@@ -92,19 +110,34 @@ class Interpreter:
 		# 	tree = self.append(tree, variables[i], directory)
 	def convert(self, object):
 		T = object['type']
-
 		if T == 'structure':
 			C = object['children']
 			for i in range(len(C)):
 				C[i] = self.convert(C[i])
+				print(C[i])
+			F = None
+			for i in range(len(C)):
+				if C[i]['type'] == 'function':
+					F = C[i]
+					del C[i]
+					break
+			print(C)
+			object = Operation(F, C)
 
 		elif T == 'function':
-		
+			C = object['class']
+			F = self.system[C]
+			object = Function(F)
+
+		elif T == 'variable':
+			C = object['class']
+			V = self.variables[C]
+			object = Value(V)
+		return object
+
 	def __call__(self, sentence):
 		sentence = revise(sentence)
-		components = define(mark(sentence, self.structural))
-		operations = define(mark(sentence, self.functional))
-		boundaries = mark(sentence, self.structural) + mark(sentence, self.functional)
+		boundaries = mark(sentence, self.system)
 
 		indices = []
 		for i in range(len(boundaries)):
@@ -121,14 +154,15 @@ class Interpreter:
 				elements.append(['/variable', i-1])
 				names.append(string)
 				string = ''
-
 		elements = define(elements)
 		for i in range(len(elements)):
 			elements[i] = [names[i], elements[i][1], 'variable']
-		model = create(elements + operations + components)
 		
+		model = create(elements + define(boundaries))
+		print(model)
 		tree = self.construct(model)
-		return tree
+		output = self.convert(tree)
+		return output
 		# rules = {'and':AND, 'or':OR}
 		# output = convert(sentence, tree, rules)
 		# return output

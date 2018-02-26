@@ -1,28 +1,44 @@
 from Functions import *
 
-class NOT:
-	def __init__(self, function):
-		self.function = function
-	def __call__(self, value):
-		return not self.function(value)
+def NOT(X):
+	a = X[0]
+	return not a
 
-class AND:
-	def __init__(self, functions):
-		self.functions = functions
-	def __call__(self, value):
-		return UN(istrue)(fcall(self.functions, value))
+def AND(X):
+	a, b = X[0],X[1]
+	return a and b
 
-class OR:
-	def __init__(self, functions):
-		self.functions = functions
-	def __call__(self, value):
-		return EX(istrue)(fcall(self.functions, value))
+def OR(X):
+	a, b = X[0], X[1]
+	return a or b
 
-class EQ:
-	def __init__(self, value):
-		self.value = value
-	def __call__(self, value):
-		return value == self.value
+def EQ(X):
+	a, b = X[0], X[1]
+	return a == b
+
+# class NOT:
+# 	def __init__(self, function):
+# 		self.function = function
+# 	def __call__(self, value):
+# 		return not self.function(value)
+
+# class AND:
+# 	def __init__(self, functions):
+# 		self.functions = functions
+# 	def __call__(self, value):
+# 		return UN(istrue)(fcall(self.functions, value))
+
+# class OR:
+# 	def __init__(self, functions):
+# 		self.functions = functions
+# 	def __call__(self, value):
+# 		return EX(istrue)(fcall(self.functions, value))
+
+# class EQ:
+# 	def __init__(self, value):
+# 		self.value = value
+# 	def __call__(self, value):
+# 		return value == self.value
 
 class MT:
 	def __init__(self, value):

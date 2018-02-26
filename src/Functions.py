@@ -70,7 +70,6 @@ def split(string, indices):
 		previous = current
 	return strings
 
-
 def mark(sentence, vocabulary):
 	markers = []
 	for i in range(len(sentence)):
