@@ -47,6 +47,7 @@ class Interpreter:
 		return O
 
 	def __call__(self, sentence):
+		sentence = revise(sentence)
 		components = define(mark(sentence, self.structural))
 		operations = define(mark(sentence, self.functional))
 		model = create(components + operations)

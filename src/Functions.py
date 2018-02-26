@@ -53,6 +53,23 @@ def parents(index, relations):
 			y.append(relations[i][0])
 	return y
 
+def revise(string):
+	output = ''
+	for i in range(len(string)):
+		if string[i] != ' ':
+			output += string[i]
+	return output
+
+def split(string, indices):
+	strings = []
+	previous = 0
+	indices.append(len(string))
+	for i in range(len(indices)):
+		current = indices[i]
+		strings.append(substring(string, previous, current))
+		previous = current
+	return strings
+
 def mark(sentence, vocabulary):
 	markers = []
 	for i in range(len(sentence)):
@@ -97,7 +114,6 @@ def create(objects):
 					relations.append((i, j))
 				elif contains(Rj, Ri):
 					relations.append((j, i))
-
 	outputs = []
 	for i in range(len(objects)):
 		symbol = objects[i][0]
