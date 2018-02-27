@@ -2,41 +2,11 @@ from Frame import *
 from Functions import *
 from Operations import *
 
-class System:
-	def __init__(self, variables, functions, operations):
-		var = dict()
-		for v in variables:
-			var[v] = None 
-		variables = var
-
-		fun = dict()
-		for i in range(len(functions)):
-			f = functions[i]
-			o = operations[i]
-			fun[f] = o 
-		functions = fun
-
-		self.variables = variables
-		self.functions = functions
-
-	def getvariable(self, name):
-		return self.variables[name]
-
-	def getfunction(self, name):
-		return self.functions[name]
-
-def Object(T, N, I, C):
-	frame = Frame(T)
-	frame['class'] = N
-	frame['index'] = I
-	frame['children'] = C
-	return frame
-
 class Interpreter:
-
 	def __init__(self, F, V):
 		self.system = F
 		self.variables = V
+
 	def compute(self, object, input):
 		P = input['parents']
 		I = object['index']
@@ -61,7 +31,6 @@ class Interpreter:
 					indices.append(j)
 					O = children[j]
 					break
-
 		O['children'].append(object)
 		for i in range(len(history)-1, -1, -1):
 			history[i]['children'][indices[i]] = O
@@ -70,8 +39,8 @@ class Interpreter:
 		return O
 
 	def construct(self, model):
-		functions = []
 		structures = []
+		functions = []
 		variables = []
 		for i in range(len(model)):
 			O = model[i]
@@ -79,8 +48,7 @@ class Interpreter:
 				structures.append(O)
 			elif O['type'] == 'function':
 				functions.append(O)
-			else:
-				variables.append(O)
+			else: variables.append(O)
 		elements = variables + functions + structures
 
 		tree = None
@@ -96,74 +64,75 @@ class Interpreter:
 				N = elements[i]['class']
 				X = Object(C, N, i, list())
 				tree = self.append(tree, X, directory)
-		
 		return tree
-		# elements = functions + variables
-		# for i in range(len(elements)):
-		# 	P = elements[i]['parents']
-		# 	directory = self.compute(tree, elements[i])
-		# 	tree = self.append(tree, elements[i], directory)
 
-		# for i in range(len(variables)):
-		# 	P = variables[i]['parents']
-		# 	directory = self.compute(tree, variables[i])
-		# 	tree = self.append(tree, variables[i], directory)
 	def convert(self, object):
 		T = object['type']
+	
 		if T == 'structure':
+			I = None
 			C = object['children']
 			for i in range(len(C)):
-				C[i] = self.convert(C[i])
-				print(C[i])
-			F = None
-			for i in range(len(C)):
-				if C[i]['type'] == 'function':
-					F = C[i]
-					del C[i]
-					break
-			print(C)
-			object = Operation(F, C)
+				C[i] = self.convert(C[i])	
+				if C[i]['type'] == 'value':
+					C[i] = C[i]['value']
+				elif C[i]['type'] == 'function':
+					C[i] = C[i]['definition']
+					I = i
+			F = C[I]
+			del C[I]
+			object = Statement(F, C)
 
 		elif T == 'function':
-			C = object['class']
-			F = self.system[C]
+			N = object['name']
+			F = self.system[N]
 			object = Function(F)
 
 		elif T == 'variable':
-			C = object['class']
-			V = self.variables[C]
+			N = object['name']
+			V = self.variables[N]
 			object = Value(V)
 		return object
 
 	def __call__(self, sentence):
+		indices = []
 		sentence = revise(sentence)
 		boundaries = mark(sentence, self.system)
-
-		indices = []
 		for i in range(len(boundaries)):
 			indices.append(boundaries[i][1])
 	
-		string = ''
+		s = ''
 		names = []
 		elements = []
 		for i in range(len(sentence)):
 			if i not in indices:
-				string += sentence[i]
-			elif string != '':
-				elements.append(['variable', i-len(string)])
+				s += sentence[i]
+			elif s != '':
+				elements.append(['variable', i-len(s)])
 				elements.append(['/variable', i-1])
-				names.append(string)
-				string = ''
+				names.append(s)
+				s = ''
+		
 		elements = define(elements)
 		for i in range(len(elements)):
 			elements[i] = [names[i], elements[i][1], 'variable']
-		
 		model = create(elements + define(boundaries))
-		print(model)
+		
 		tree = self.construct(model)
 		output = self.convert(tree)
 		return output
-		# rules = {'and':AND, 'or':OR}
-		# output = convert(sentence, tree, rules)
-		# return output
 
+def Create(alphabet):
+	system = dict()
+	for i in range(len(alphabet)):
+		s = alphabet[i]
+		name = s['name']
+		sign = s['sign']
+		if isinstance(sign, list):
+			system[sign[0]] = name
+			system[sign[1]] = '/' + name
+		else:
+			function = s['function'] 
+			system[sign] = '/' + name + '/' 
+			system[name] = function
+	return system

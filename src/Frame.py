@@ -47,6 +47,12 @@ def Operation(function, input):
 	frame['input'] = input
 	return frame
 
+def Statement(function, input):
+	frame = Frame('statement')
+	frame['function'] = function
+	frame['input'] = input
+	return frame
+
 def Function(definition):
 	frame = Frame('function')
 	frame['definition'] = definition
@@ -71,3 +77,25 @@ def Value(value):
 	frame = Frame('value')
 	frame['value'] = value
 	return frame
+
+def Object(type, name, index, children):
+	frame = Frame(type)
+	frame['name'] = name
+	frame['index'] = index
+	frame['children'] = children
+	return frame
+
+def Symbol(name, sign, function):
+	frame = Frame('symbol')
+	frame['name'] = name
+	frame['sign'] = sign
+	frame['function'] = function
+	return frame
+
+def CALL(statement):
+	F = statement['function']
+	X = statement['input']
+	for i in range(len(X)):
+		if isinstance(X[i], Frame):
+			X[i] = CALL(X[i])
+	return F(X)

@@ -2,15 +2,13 @@ from Functions import *
 
 def NOT(X):
 	a = X[0]
-	return not a
+	return True not in X
 
 def AND(X):
-	a, b = X[0],X[1]
-	return a and b
+	return False not in X
 
 def OR(X):
-	a, b = X[0], X[1]
-	return a or b
+	return True in X
 
 def EQ(X):
 	a, b = X[0], X[1]
