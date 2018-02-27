@@ -117,7 +117,6 @@ class Interpreter:
 		for i in range(len(elements)):
 			elements[i] = [names[i], elements[i][1], 'variable']
 		model = create(elements + define(boundaries))
-		
 		tree = self.construct(model)
 		output = self.convert(tree)
 		return output
