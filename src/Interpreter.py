@@ -159,7 +159,7 @@ class Interpreter:
 					previous = indices[len(indices)-1]
 					del indices[len(indices)-1]
 					del names[len(names)-1]
-					objects.append(('statement', (previous, index)))
+					objects.append((None, (previous, index)))
 			
 			elif name[0] == '/':
 				previous_name = names[len(names)-1]
@@ -168,26 +168,49 @@ class Interpreter:
 					del indices[len(indices)-1]
 					del names[len(names)-1]
 					model = self.system.database[previous_name]
-					if model['type'] == 'f':
-						label = 'function'
-					elif model['type'] == 'v':
-						label = 'variable'	
-					objects.append((label, (previous, index)))
+					objects.append((previous_name, (previous, index)))
 			else:
 				names.append(name)
 				indices.append(index)
 		print(objects)						
 
-		relations = []
+		children = []
 		for i in range(len(objects)):
+			children.append([])
 			for j in range(len(objects)):
 				range1 = objects[i][1]
 				range2 = objects[j][1]
 				if contains(range1, range2):
-					relations.append((i, j))
+					children[i].append((j))
 
-		print(relations)
+		for i in range(len(children)):
+			indices = children[i]
+			for j in range(len(indices)):
+				for k in range(len(indices)):
+					child = indices[j]
+					if indices[k] in children[child]:
+						indices[k] = None
+			children[i] = indices
 
+		for i in range(len(children)):
+			indices = []
+			for j in range(len(children[i])):
+				if children[i][j] != None:
+					indices.append(children[i][j])
+			children[i] = indices
+
+		tree = create_tree(children, len(children)-1, objects)
+		print(tree)
+
+def create_tree(children, index, objects):
+	tree = []
+	for i in range(len(children[index])):
+		child = children[index][i]
+		if len(children[child]) > 0:
+			tree.append(create_tree(children, child, objects))
+		else:
+			tree.append(objects[child][0])
+	return tree
 		# # for i in range(len(boundaries)):
 		# # 	indices.append(boundaries[i][1])
 	
