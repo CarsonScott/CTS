@@ -3,9 +3,8 @@ from Functions import *
 from Operations import *
 
 class Interpreter:
-	def __init__(self, F, V):
-		self.system = F
-		self.variables = V
+	def __init__(self, system):
+		self.system = system
 
 	def compute(self, object, input):
 		P = input['parents']
@@ -95,31 +94,127 @@ class Interpreter:
 		return object
 
 	def __call__(self, sentence):
-		indices = []
 		sentence = revise(sentence)
-		boundaries = mark(sentence, self.system)
-		for i in range(len(boundaries)):
-			indices.append(boundaries[i][1])
-	
-		s = ''
-		names = []
-		elements = []
+
+		symbols = keys(self.system.vocabulary)
+		v_symbols = []
+		f_symbols = []
+
+		for i in range(len(symbols)):
+			symbol = symbols[i]
+			model = self.system.translate(symbol) 		
+			if model['type'] == 'f':f_symbols.append(symbols[i])
+			elif model['type'] == 'v':v_symbols.append(symbols[i])
+
+		boundaries = []
 		for i in range(len(sentence)):
-			if i not in indices:
-				s += sentence[i]
-			elif s != '':
-				elements.append(['variable', i-len(s)])
-				elements.append(['/variable', i-1])
-				names.append(s)
-				s = ''
-		
-		elements = define(elements)
+			if sentence[i] in f_symbols:
+				symbol = self.system.vocabulary[sentence[i]]
+				boundaries.append((symbol, i))
+
+		strings = []
+		indices = []
+		for i in range(1, len(boundaries)):
+			index1 = boundaries[i-1][1]+1
+			index2 = boundaries[i][1]-1
+			string = substring(sentence, index1, index2+1)
+			if string != '':
+				strings.append(string)
+				indices.append([index1, index2])
+
+		elements = []
+		for i in range(len(strings)):
+			index1, index2 = indices[i]
+			elements.append((strings[i], index1))
+			elements.append(('/'+strings[i], index2))
+
+		for i in range(len(boundaries)):
+			name, index = boundaries[i]
+			elements.append((name, index))
+			if name[0] != '_':
+				elements.append(('/'+name, index))
+
+		indices = []
 		for i in range(len(elements)):
-			elements[i] = [names[i], elements[i][1], 'variable']
-		model = create(elements + define(boundaries))
-		tree = self.construct(model)
-		output = self.convert(tree)
-		return output
+			indices.append(elements[i][1])
+
+		ordered = []
+		indices = sort(indices)
+		for i in indices:
+			ordered.append(elements[i])
+		elements = ordered
+		print(elements)
+		names = []
+		indices = []
+		objects = []
+		for i in range(len(elements)):
+			name = elements[i][0]
+			index = elements[i][1]
+			
+			if name[0] == '_':
+				if name == '_open':
+					indices.append(index)
+					names.append(name)		
+				if name == '_close':
+					previous = indices[len(indices)-1]
+					del indices[len(indices)-1]
+					del names[len(names)-1]
+					objects.append(('statement', (previous, index)))
+			
+			elif name[0] == '/':
+				previous_name = names[len(names)-1]
+				if name == '/' + previous_name:
+					previous = indices[len(indices)-1]
+					del indices[len(indices)-1]
+					del names[len(names)-1]
+					model = self.system.database[previous_name]
+					if model['type'] == 'f':
+						label = 'function'
+					elif model['type'] == 'v':
+						label = 'variable'	
+					objects.append((label, (previous, index)))
+			else:
+				names.append(name)
+				indices.append(index)
+		print(objects)						
+
+		relations = []
+		for i in range(len(objects)):
+			for j in range(len(objects)):
+				range1 = objects[i][1]
+				range2 = objects[j][1]
+				if contains(range1, range2):
+					relations.append((i, j))
+
+		print(relations)
+
+		# # for i in range(len(boundaries)):
+		# # 	indices.append(boundaries[i][1])
+	
+		# s = ''
+		# names = []
+		# elements = []
+		# for i in range(len(sentence)):
+		# 	if i not in indices:
+		# 		s += sentence[i]
+		# 	elif s != '':
+		# 		elements.append(['variable', i-len(s)])
+		# 		elements.append(['/variable', i])
+		# 		names.append(s)
+		# 		s = ''
+
+		# elements = define(elements)
+		# for i in range(len(elements)):
+		# 	elements[i] = [names[i], elements[i][1], 'variable']
+
+		# model = create(elements + define(boundaries))
+		
+		# for m in model:
+		# 	print(m)
+
+		# tree = self.construct(model)
+		# output = self.convert(tree)
+		# return output
 
 def Create(alphabet):
 	system = dict()
@@ -131,7 +226,7 @@ def Create(alphabet):
 			system[sign[0]] = name
 			system[sign[1]] = '/' + name
 		else:
-			function = s['function'] 
 			system[sign] = '/' + name + '/' 
+			function = s['function'] 
 			system[name] = function
 	return system
