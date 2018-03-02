@@ -1,40 +1,38 @@
-from Functions import *
+from Memory import *
 from Operator import *
+from Functions import *
 
 class System:
+
 	def __init__(self, memory, database, vocabulary):
-		self.memory = memory
-		self.database = database
 		self.vocabulary = vocabulary
+		self.database = database
+		self.memory = memory
 
-	def translate(self, symbol):
-		name = self.vocabulary[symbol]
-		return self.database[name]
-
-	def reference(self, name):
-		model = self.database[name]
-		t = model['type']
-		i = model['index']
-		return self.memory[t][i]
+	def _word(self, symbol):
+		return self.vocabulary[symbol]
+	def _model(self, word):
+		return self.database[word]
+	def _data(self, model):
+		return self.memory[model['type']][model['index']]
 
 	def parse(self, sentence):
 		sentence = revise(sentence)
-
 		symbols = keys(self.vocabulary)
 		v_symbols = []
 		f_symbols = []
 
 		for i in range(len(symbols)):
 			symbol = symbols[i]
-			model = self.translate(symbol) 		
+			model = self._model(self._word(symbol))
 			if model['type'] == 'f':f_symbols.append(symbols[i])
 			elif model['type'] == 'v':v_symbols.append(symbols[i])
 
 		boundaries = []
 		for i in range(len(sentence)):
 			if sentence[i] in f_symbols:
-				symbol = self.vocabulary[sentence[i]]
-				boundaries.append((symbol, i))
+				name = self._word(sentence[i])
+				boundaries.append((name, i))
 
 		strings = []
 		indices = []
@@ -91,7 +89,7 @@ class System:
 					previous = indices[len(indices)-1]
 					del indices[len(indices)-1]
 					del names[len(names)-1]
-					model = self.database[previous_name]
+					model = self._model(previous_name)
 					objects.append((previous_name, (previous, index)))
 			else:
 				names.append(name)
@@ -130,16 +128,14 @@ class System:
 		for i in range(len(tree)):
 			if isinstance(tree[i], list):
 				operator['x'].append(self.execute(tree[i]))
-			
 			else:
 				name = tree[i]
-				model = self.database[name]
-				data = self.reference(name)
+				model = self._model(name)
+				data = self._data(self._model(name))
 
 				if model['type'] == 'f':
 					operator['f'] = data
 				elif model['type'] == 'v':
 					operator['x'].append(data)
-		
 		return operator.compute()
 

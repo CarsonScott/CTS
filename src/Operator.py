@@ -1,20 +1,5 @@
-class Size:
-	def __init__(self, s):
-		self.size = s
-		
-	def __call__(self, x):
-		return len(x) == self.size
-
-class Constraint(dict):
-	def __init__(self, k, p):
-		self['k'] = k
-		self['p'] = p
-
-def InputSize(Constraint):
-	def __init__(self, s):
-		super().__init__('x',[Size(s)])
-
 class Operator(dict):
+
 	def __init__(self):
 		self['x'] = list()
 		self['f'] = None
@@ -32,3 +17,34 @@ class Operator(dict):
 		f = self['f']
 		x = self['x']
 		return f(x)
+
+def NOT(X):
+	if len(X) != 1:raise Exception()
+	return not X[0]
+def AND(X):
+	if len(X) != 2:raise Exception()
+	return X[0] and X[1]	
+def OR(X):
+	if len(X) != 2:raise Exception()
+	return X[0] or X[1]
+def EQ(X):
+	if len(X) != 2:raise Exception()
+	return X[0] == X[1]
+def MT(X):
+	if len(X) != 2:raise Exception()
+	return X[0] > X[1]
+def LT(X):
+	if len(X) != 2:raise Exception()
+	return X[0] < X[1]
+def ADD(X):
+	if len(X) != 2:raise Exception()
+	return X[0] + X[1]
+def SUB(X):
+	if len(X) != 2:raise Exception()
+	return X[0] - X[1]
+def MULT(X):
+	if len(X) != 2:raise Exception()
+	return X[0] * X[1]
+def DIV(X):
+	if len(X) != 2:raise Exception()
+	return X[0] / X[1]

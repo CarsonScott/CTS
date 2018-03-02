@@ -1,19 +1,15 @@
-from Interpreter import *
-from Operations import *
-
-class Memory(dict):
-	def data(self):
-		self['f'] = []
-		self['v'] = []
-
-	def create(self, functions, variables):
-		self['f'] = functions
-		self['v'] = variables
+class Vocabulary(dict):
+	def word(self, symbol, name):
+		self[symbol] = name
+	def create(self, symbols, names):
+		for i in range(len(symbols)):
+			name = names[i]
+			symbol = symbols[i]
+			self.word(symbol, name)
 
 class Database(dict):
 	def model(self, name, type, index):
 		self[name] = {'type': type, 'index': index}
-
 	def create(self, function_names, variable_names):
 		for i in range(len(function_names)):
 			name = function_names[i]
@@ -22,13 +18,11 @@ class Database(dict):
 			name = variable_names[i]
 			self.model(name, 'v', i)
 
-class Vocabulary(dict):
-	def word(self, symbol, name):
-		self[symbol] = name
-
-	def create(self, symbols, names):
-		for i in range(len(symbols)):
-			name = names[i]
-			symbol = symbols[i]
-			self.word(symbol, name)
+class Memory(dict):
+	def data(self):
+		self['f'] = []
+		self['v'] = []
+	def create(self, functions, variables):
+		self['f'] = functions
+		self['v'] = variables
 
