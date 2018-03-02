@@ -1,27 +1,39 @@
 from Functions import *
 from Operator import *
 
-class Interpreter:
-	def __init__(self, system):
-		self.system = system
+class System:
+	def __init__(self, memory, database, vocabulary):
+		self.memory = memory
+		self.database = database
+		self.vocabulary = vocabulary
+
+	def translate(self, symbol):
+		name = self.vocabulary[symbol]
+		return self.database[name]
+
+	def reference(self, name):
+		model = self.database[name]
+		t = model['type']
+		i = model['index']
+		return self.memory[t][i]
 
 	def parse(self, sentence):
 		sentence = revise(sentence)
 
-		symbols = keys(self.system.vocabulary)
+		symbols = keys(self.vocabulary)
 		v_symbols = []
 		f_symbols = []
 
 		for i in range(len(symbols)):
 			symbol = symbols[i]
-			model = self.system.translate(symbol) 		
+			model = self.translate(symbol) 		
 			if model['type'] == 'f':f_symbols.append(symbols[i])
 			elif model['type'] == 'v':v_symbols.append(symbols[i])
 
 		boundaries = []
 		for i in range(len(sentence)):
 			if sentence[i] in f_symbols:
-				symbol = self.system.vocabulary[sentence[i]]
+				symbol = self.vocabulary[sentence[i]]
 				boundaries.append((symbol, i))
 
 		strings = []
@@ -79,7 +91,7 @@ class Interpreter:
 					previous = indices[len(indices)-1]
 					del indices[len(indices)-1]
 					del names[len(names)-1]
-					model = self.system.database[previous_name]
+					model = self.database[previous_name]
 					objects.append((previous_name, (previous, index)))
 			else:
 				names.append(name)
@@ -121,8 +133,8 @@ class Interpreter:
 			
 			else:
 				name = tree[i]
-				model = self.system.database[name]
-				data = self.system.reference(name)
+				model = self.database[name]
+				data = self.reference(name)
 
 				if model['type'] == 'f':
 					operator['f'] = data
@@ -131,13 +143,3 @@ class Interpreter:
 		
 		return operator.compute()
 
-def create_tree(children, index, objects):
-	tree = []
-	for i in range(len(children[index])):
-		child = children[index][i]
-		if len(children[child]) > 0:
-			tree.append(create_tree(children, child, objects))
-		else:
-			tree.append(objects[child][0])
-	return tree
-	

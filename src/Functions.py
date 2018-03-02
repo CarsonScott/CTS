@@ -157,44 +157,13 @@ def convert(sentence, frame, vocabulary):
 		frame['children'] = children
 	return frame
 
-
-# class Structure(dict):
-# 	def __init__(self, type, value, domain):
-# 		self['type'] = type
-# 		self['data'] = value
-# 		self['domain'] = domain
-
-# def construct(sentence, objects):
-# 	requirements = []
-# 	outputs = objects
-# 	for i in range(len(objects)):
-# 		if not isinstance(objects[i], Structure):
-# 			elements = objects[i][2]
-			
-# 			if len(elements) == 0:
-# 				start, end = objects[i][1]
-# 				if start == end:
-# 					value = sentence[start]
-# 				else:
-# 					value = substring(sentence, start+1, end)
-# 				outputs[i] = Structure('model', value, (start,end))
-# 			else:
-# 				unassigned = []
-# 				for j in range(len(elements)):
-# 					if not isinstance(elements[j], Structure):
-# 						object = objects[elements[j]]
-# 						if isinstance(object, Structure):
-# 							elements[j] = object
-# 						else:
-# 							unassigned.append(j)
-# 				requirements.append(unassigned)
-# 				outputs[i][2] = elements
-				
-# 				if len(unassigned) == 0:
-# 					values = outputs[i][2]
-# 					domain = outputs[i][1]
-# 					outputs[i] = Structure('model', values, domain)
-
-# 	if len(requirements) > 0:
-# 		outputs = construct(sentence, outputs)
-# 	return outputs
+def create_tree(children, index, objects):
+	tree = []
+	for i in range(len(children[index])):
+		child = children[index][i]
+		if len(children[child]) > 0:
+			tree.append(create_tree(children, child, objects))
+		else:
+			tree.append(objects[child][0])
+	return tree
+	
