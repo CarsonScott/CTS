@@ -3,7 +3,6 @@ from Operator import *
 from Functions import *
 
 class System:
-
 	def __init__(self, memory, database, vocabulary):
 		self.vocabulary = vocabulary
 		self.database = database
@@ -125,17 +124,20 @@ class System:
 
 	def execute(self, tree):
 		operator = Operator()
+		x = []
+		f = None
 		for i in range(len(tree)):
 			if isinstance(tree[i], list):
-				operator['x'].append(self.execute(tree[i]))
+				x.append(self.execute(tree[i]))
 			else:
 				name = tree[i]
 				model = self._model(name)
 				data = self._data(self._model(name))
 
 				if model['type'] == 'f':
-					operator['f'] = data
+					f = data
 				elif model['type'] == 'v':
-					operator['x'].append(data)
-		return operator.compute()
+					x.append(data)
+		operator = Operator(f)
+		return operator(x)	
 
