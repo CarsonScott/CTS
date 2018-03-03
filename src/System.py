@@ -3,10 +3,16 @@ from Operator import *
 from Functions import *
 
 class System:
-	def __init__(self, memory, database, vocabulary):
-		self.vocabulary = vocabulary
-		self.database = database
-		self.memory = memory
+	def __init__(self):
+		self.vocabulary = Vocabulary()
+		self.database = Database()
+		self.memory = Memory()
+		self.script = []
+		self.inputs = []
+		self.fun(None, '.id', ID)
+		self.fun(None, '.set', SET)
+		self.fun(None, '_open', None)
+		self.fun(None, '_close', None)
 
 	def _word(self, symbol):
 		return self.vocabulary[symbol]
@@ -14,6 +20,35 @@ class System:
 		return self.database[word]
 	def _data(self, model):
 		return self.memory[model['type']][model['index']]
+
+	def __setitem__(self, variable, value):
+		model = self._model(variable)
+		self.memory[model['type']][model['index']] = value
+		
+	def __getitem__(self, variable):
+		model = self._model(variable)
+		return self.memory[model['type']][model['index']]
+
+	def fun(self, symbol, name, operator):
+		self.vocabulary.word(symbol, name)
+		self.memory.data('f', operator)
+		self.database.model(name, 'f', len(self.memory['f'])-1) 
+
+	def var(self, symbol, value):
+		self.vocabulary.word(symbol, symbol)
+		self.memory.data('v', value)
+		self.database.model(symbol, 'v', len(self.memory['v'])-1) 
+
+	def compute(self, inputs):
+		self.update(inputs)
+		outputs = []
+		for i in range(len(self.script)):
+			outputs.append(self.execute(self.parse(self.script[i])))
+		return outputs
+
+	def update(self, values):
+		for i in range(len(values)):
+			self[self.inputs[i]] = values[i]
 
 	def parse(self, sentence):
 		sentence = revise(sentence)
@@ -123,21 +158,52 @@ class System:
 		return tree
 
 	def execute(self, tree):
-		operator = Operator()
 		x = []
-		f = None
-		for i in range(len(tree)):
-			if isinstance(tree[i], list):
-				x.append(self.execute(tree[i]))
-			else:
-				name = tree[i]
-				model = self._model(name)
-				data = self._data(self._model(name))
+		if len(tree) == 1:
+			f = '.id'
+			x.append(tree[0])
+		elif len(tree) == 2:
+			f = tree[0]
+			x.append(tree[1])
+		elif len(tree) == 3:
+			f = tree[1]
+			x.append(tree[0])
+			x.append(tree[2])
 
-				if model['type'] == 'f':
-					f = data
-				elif model['type'] == 'v':
-					x.append(data)
-		operator = Operator(f)
-		return operator(x)	
+		for i in range(len(x)):
+			if f == '.set' and i == 0:
+				x[i] = self._model(x[i])['index']
+			elif f == '.if' and x[0] == False:
+				x[i] = None
+			else:
+				if isinstance(x[i], list):
+					x[i] = self.execute(x[i])
+				elif isinstance(x[i], str):
+					x[i] = self._data(self._model(x[i]))
+
+		if f != '.if':
+			if f == '.set':
+				x.insert(0, self.memory['v'])
+			f = self._data(self._model(f))
+			y = f(x)
+		else: y = x[1]
+		return y
+		# for i in range(len(tree)):
+		# 	if isinstance(tree[i], list):
+		# 		x.append(self.execute(tree[i]))
+		# 	else:
+		# 		name = tree[i]
+		# 		model = self._model(name)
+		# 		data = self._data(self._model(name))
+
+		# 		if model['type'] == 'f':
+		# 			f = data
+		# 		elif model['type'] == 'v':
+		# 			x.append(data)
+
+		# 		if name[0] == '.':
+		# 			ismember = True
+		
+		# operator = Operator(f)
+		# return operator(x)	
 

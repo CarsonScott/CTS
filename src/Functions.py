@@ -1,3 +1,16 @@
+def isnumber(x):
+	try:
+		int(x)
+		return True
+	except:
+		return False
+
+def num(x):
+	if '.' in str(x):
+		return float(x)
+	else:
+		return int(x)
+
 def keys(d):
 	return list(d.keys())
 
@@ -25,10 +38,9 @@ def create_tree(children, index, objects):
 		child = children[index][i]
 		if len(children[child]) > 0:
 			tree.append(create_tree(children, child, objects))
-		else:
-			tree.append(objects[child][0])
+		else:tree.append(objects[child][0])
 	return tree
-	
+
 def sort(X):
 	values = X
 	indices = [i for i in range(len(X))]
@@ -41,8 +53,20 @@ def sort(X):
 				value = values[i-1]
 				values[i-1] = values[i]
 				values[i] = value
-
 				index = indices[i-1]
 				indices[i-1] = indices[i]
 				indices[i] = index
 	return indices
+
+def extract(space, kernel):
+	xi = kernel['x'] - round(kernel['w']/2)
+	xf = kernel['x'] + round(kernel['w']/2)
+	yi = kernel['y'] - round(kernel['h']/2)
+	yf = kernel['y'] + round(kernel['h']/2)
+	subspace = []
+	for y in range(yi, yf+1):
+		row = []
+		for x in range(xi, xf+1	):
+			row.append(space[y][x])
+		subspace.append(row)
+	return subspace

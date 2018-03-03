@@ -99,3 +99,15 @@ def MULT(X):
 def DIV(X):
 	if len(X) != 2:raise Exception()
 	return X[0] / X[1]
+def LEN(X):
+	if len(X) != 1: raise Exception()
+	return len(X[0])
+def ID(X):
+	if len(X) != 1: raise Exception()
+	return X[0]
+def GET(X):
+	if len(X) != 2: raise Exception()
+	return X[0][X[1]]
+def SET(X):
+	if len(X) != 3: raise Exception()
+	X[0][X[1]] = X[2]
