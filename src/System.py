@@ -188,22 +188,3 @@ class System:
 			y = f(x)
 		else: y = x[1]
 		return y
-		# for i in range(len(tree)):
-		# 	if isinstance(tree[i], list):
-		# 		x.append(self.execute(tree[i]))
-		# 	else:
-		# 		name = tree[i]
-		# 		model = self._model(name)
-		# 		data = self._data(self._model(name))
-
-		# 		if model['type'] == 'f':
-		# 			f = data
-		# 		elif model['type'] == 'v':
-		# 			x.append(data)
-
-		# 		if name[0] == '.':
-		# 			ismember = True
-		
-		# operator = Operator(f)
-		# return operator(x)	
-

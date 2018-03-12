@@ -2,7 +2,6 @@ from System import *
 
 def Kernel(width, height):
 	system = System()
-
 	system.fun('&', 'and', AND)
 	system.fun('>', 'more', MT)
 	system.fun('<', 'less', LT)
@@ -11,7 +10,6 @@ def Kernel(width, height):
 	system.fun('?', '.if', None)
 	system.fun('(', '_open', None)
 	system.fun(')', '_close', None)
-
 	system.var('w', width)
 	system.var('h', height)
 	system.var('x', 0)
