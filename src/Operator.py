@@ -111,3 +111,6 @@ def GET(X):
 def SET(X):
 	if len(X) != 3: raise Exception()
 	X[0][X[1]] = X[2]
+def CALL(X):
+	if len(X) != 2: raise Exception()
+	return X[0](X[1])

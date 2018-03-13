@@ -1,8 +1,9 @@
 from System import *
+from Classifier import *
 
-def Kernel(width, height):
+def Kernel(width, height, patterns):
 	system = System()
-	system.fun('&', 'and', AND)
+	system.fun('~', 'call', CALL)
 	system.fun('>', 'more', MT)
 	system.fun('<', 'less', LT)
 	system.fun('+', 'plus', ADD)
@@ -25,11 +26,14 @@ def Kernel(width, height):
 	system.var('down', (0, -1))
 	system.var('left', (-1, 0))
 	system.var('right', (1, 0))
+	system.var('classifier', Classifier(patterns))
+	system.var('input', None)
 	
-	system.inputs = ['tx', 'ty']
+	system.inputs = ['tx', 'ty', 'input']
 	system.script = ['((x > tx) ? (dx : dec))','((x < tx) ? (dx : inc))',
 		 	 	     '((y > ty) ? (dy : dec))','((y < ty) ? (dy : inc))',
 		 		     '(x : (x + dx))','(y : (y + dy))',
-		 		     '(dx : def)','(dy : def)']
+		 		     '(dx : def)','(dy : def)',
+		 		     '(classifier ~ input)']
 	return system
 
