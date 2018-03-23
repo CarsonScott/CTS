@@ -3,6 +3,7 @@ from Operator import *
 from Functions import *
 
 class System:
+
 	def __init__(self):
 		self.vocabulary = Vocabulary()
 		self.database = Database()
@@ -14,6 +15,15 @@ class System:
 		self.fun(None, '_open', None)
 		self.fun(None, '_close', None)
 
+	def __setitem__(self, variable, value):
+		model = self._model(variable)
+		self.memory[model['type']][model['index']] = value
+	def __getitem__(self, variable):
+		model = self._model(variable)
+		return self.memory[model['type']][model['index']]
+	def __call__(self, inputs):
+		return
+	
 	def _word(self, symbol):
 		return self.vocabulary[symbol]
 	def _model(self, word):
@@ -21,34 +31,31 @@ class System:
 	def _data(self, model):
 		return self.memory[model['type']][model['index']]
 
-	def __setitem__(self, variable, value):
-		model = self._model(variable)
-		self.memory[model['type']][model['index']] = value
-		
-	def __getitem__(self, variable):
-		model = self._model(variable)
-		return self.memory[model['type']][model['index']]
-
-	def fun(self, symbol, name, operator):
+	def fun(self, symbol, name, operator=None):
 		self.vocabulary.word(symbol, name)
 		self.memory.data('f', operator)
 		self.database.model(name, 'f', len(self.memory['f'])-1) 
-
-	def var(self, symbol, value):
+	def var(self, symbol, value=None):
 		self.vocabulary.word(symbol, symbol)
 		self.memory.data('v', value)
-		self.database.model(symbol, 'v', len(self.memory['v'])-1) 
-
-	def compute(self, inputs):
-		self.update(inputs)
-		outputs = []
-		for i in range(len(self.script)):
-			outputs.append(self.execute(self.parse(self.script[i])))
-		return outputs
+		self.database.model(symbol, 'v', len(self.memory['v'])-1)
+	
+	def add_input(self, variable):
+		self.inputs.append(variable)
+	def add_statement(self, statement):
+		self.script.append(statement)
 
 	def update(self, values):
 		for i in range(len(values)):
 			self[self.inputs[i]] = values[i]
+	def compute(self, inputs):
+		self.update(inputs)
+		outputs = []
+		for i in range(len(self.script)):
+			tree = self.parse(self.script[i])
+			output = self.execute(tree)
+			outputs.append(output)
+		return outputs
 
 	def parse(self, sentence):
 		sentence = revise(sentence)
