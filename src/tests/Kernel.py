@@ -1,6 +1,19 @@
 from System import *
 from Classifier import *
 
+def extract(space, kernel):
+	xi = kernel['x'] - round(kernel['w']/2)
+	xf = kernel['x'] + round(kernel['w']/2)
+	yi = kernel['y'] - round(kernel['h']/2)
+	yf = kernel['y'] + round(kernel['h']/2)
+	subspace = []
+	for y in range(yi, yf+1):
+		row = []
+		for x in range(xi, xf+1	):
+			row.append(space[y][x])
+		subspace.append(row)
+	return subspace
+
 def Kernel(width, height, patterns):
 	system = System()
 	system.fun('~', 'call', CALL)

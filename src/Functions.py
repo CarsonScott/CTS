@@ -1,49 +1,36 @@
-def isnumber(x):
-	try:
-		int(x)
-		return True
-	except:
-		return False
+def keys(x):
+	return list(x.keys())
 
-def num(x):
+def is_num(x):
+	try:float(x)
+	except:return False
+	return True
+
+def to_num(x):
 	if '.' in str(x):
 		return float(x)
-	else:
-		return int(x)
+	else:return int(x)
 
-def keys(d):
-	return list(d.keys())
-
-def substring(X, s, e):
-	Y = ''
-	for i in range(s, e):
-		Y += X[i]
-	return Y
-
-def contains(range1, range2):
-	i1, f1 = range1
-	i2, f2 = range2
+def contains(r1, r2):
+	i1, f1 = r1
+	i2, f2 = r2
 	return i1 < i2 and f1 > f2
 
-def revise(string):
-	output = ''
-	for i in range(len(string)):
-		if string[i] != ' ':
-			output += string[i]
-	return output
+def substring(x, i, j):
+	y = ''
+	for k in range(i, j):
+		y += x[k]
+	return y
 
-def create_tree(children, index, objects):
-	tree = []
-	for i in range(len(children[index])):
-		child = children[index][i]
-		if len(children[child]) > 0:
-			tree.append(create_tree(children, child, objects))
-		else:tree.append(objects[child][0])
-	return tree
+def revise(x):
+	y = ''
+	for i in range(len(x)):
+		if x[i] != ' ':y += x[i]
+	return y
 
-def sort(X):
-	values = X
-	indices = [i for i in range(len(X))]
+def sort(x):
+	values = x
+	indices = [i for i in range(len(x))]
 	done = False
 	while not done:
 		done = True
@@ -58,15 +45,3 @@ def sort(X):
 				indices[i] = index
 	return indices
 
-def extract(space, kernel):
-	xi = kernel['x'] - round(kernel['w']/2)
-	xf = kernel['x'] + round(kernel['w']/2)
-	yi = kernel['y'] - round(kernel['h']/2)
-	yf = kernel['y'] + round(kernel['h']/2)
-	subspace = []
-	for y in range(yi, yf+1):
-		row = []
-		for x in range(xi, xf+1	):
-			row.append(space[y][x])
-		subspace.append(row)
-	return subspace
