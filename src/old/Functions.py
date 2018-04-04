@@ -45,3 +45,22 @@ def sort(x):
 				indices[i] = index
 	return indices
 
+def is_true(x):
+	return x == True
+
+def is_false(x):
+	return x == False
+
+def all_to(O, x):
+	return [o(x) for o in O]
+
+def to_all(o, X):
+	return [o(x) for x in X]
+
+def for_all(o, x):
+	return False not in to_all(o, x)
+
+def for_some(o, x):
+	return True in to_all(o, x)
+
+

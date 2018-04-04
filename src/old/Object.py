@@ -20,9 +20,9 @@ o = Object()
 o.fun('(', '_open')
 o.fun(')', '_close')
 
-o.fun('!', 'not', NOT)
-o.fun('&', 'and', AND)
-o.fun('|', 'or', OR)
+o.fun('!', '!', NOT)
+o.fun('&', '&', AND)
+o.fun('|', '|', OR)
 
 o.var('a')
 o.var('b')
@@ -34,7 +34,6 @@ o.add_input('c')
 
 o.add_statement('(a & (!b))', 0.5)
 o.add_statement('(b | c)', 0.5)
-
 
 y = o([True, False, True])
 print(y)
