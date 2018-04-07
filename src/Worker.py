@@ -1,5 +1,5 @@
 from Agent import *
-from random import randrange as rr
+
 class Worker(Agent):
 
 	def __init__(self, isize=None, bsize=None):
@@ -63,12 +63,3 @@ class Detector(Worker):
 	def state(self, key, state):
 		self.set(key + '.s', state)
 
-
-worker = Detector(10, 10)
-worker.initialize({'and':1, 'very':2, 'cool':2})
-for i in range(109):
-	print(worker.buffer)
-	X = ['and','very','cool']
-	x = X[rr(len(X))]
-	worker.observe(i, x)
-	print(worker.get('and'))
