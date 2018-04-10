@@ -58,3 +58,19 @@ def POS(X):
 def ZERO(X):
 	if len(X) < 1: raise Exception()
 	return X[0] == 0
+
+def LEFTOF(X):
+	if len(X) < 2: raise Exception()
+	return X[0]['x'] < X[1]['x']
+
+def RIGHTOF(X):
+	if len(X) < 2: raise Exception()
+	return X[0]['x'] > X[1]['x']
+
+def ABOVE(X):
+	if len(X) < 2: raise Exception()
+	return X[0]['y'] > X[1]['y']
+
+def BELOW(X):
+	if len(X) < 2: raise Exception()
+	return X[0]['y'] < X[1]['y']

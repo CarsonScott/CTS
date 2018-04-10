@@ -3,8 +3,8 @@ from Operator import MT, LT, EQ
 
 graph = Graph()
 
-# create 5 variables
-graph.create('a b c d', 'number')
+# create 5 variables						
+graph.create('a b c d e', 'number')
 graph.set('a', 34)
 graph.set('b', 4)
 graph.set('c', 23)
@@ -29,3 +29,4 @@ graph.generate(['more', 'less', 'equal'])
 # display graph model
 model = graph.model()
 print(model)
+
