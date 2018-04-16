@@ -48,12 +48,6 @@ for i in range(len(grid)):
 # create graph
 graph = Graph()
 
-# add 4 operators to the graph
-graph.create('leftof rightof above below', 'operator')
-graph.set('leftof',LEFTOF)
-graph.set('rightof', RIGHTOF)
-graph.set('above', ABOVE)
-graph.set('below', BELOW)
 
 # add nodes to the graph from 1's in the grid
 for i in range(len(grid)):
@@ -70,6 +64,13 @@ for i in graph.keys():
 			d = distance(a, b)
 			if d <= 2:
 				graph.link(i, j)
+
+# add 4 operators to the graph
+graph.create('leftof rightof above below', 'operator')
+graph.set('leftof',LEFTOF)
+graph.set('rightof', RIGHTOF)
+graph.set('above', ABOVE)
+graph.set('below', BELOW)
 
 # label links with operators
 graph.generate(['leftof', 'rightof', 'above', 'below'])
