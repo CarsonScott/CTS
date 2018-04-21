@@ -1,59 +1,66 @@
 from Graph import *
+from Agent import *
 from Operator import LEFTOF, RIGHTOF, ABOVE, BELOW
 from random import randrange as rr
 from math import sqrt
 
-LETTERS = 'abcdefghijklmnopqrtstuvwxyz'
-NUMBERS = '0123456789'
+class ImageAgent(Agent):
+	
+	def update(self):
+		i = self.i
 
-class Point(dict):
-	def __init__(self, x, y):
-		self['x'] = x
-		self['y'] = y
+		Ni = []
+		for j in range(len(self.N)):
+			if self.N[j] not in self.V:
+				Ni.append(self.N[j])
 
-def distance(p1, p2):
-	x1, y1 = p1['x'], p1['y']
-	x2, y2 = p2['x'], p2['y']
-	return sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))
+		y = None
+		if len(Ni) == 0:
+			if i not in self.V:
+				y = self.H[len(self.H)-1]
+				
+		self.H.append(i)
+		if i not in self.V:
+			self.V.append(y)
 
-class Grid(list):
-	def __init__(self, w, h, v=None):
-		for i in range(h):
-			self.append([])
-			for j in range(w):
-				self[i].append(v)
+		self.set(y)
 
-	def print(self):
-		for i in range(len(self)):
-			string = ''
-			for j in range(len(self[i])):
-				string += str(self[i][j]) + ' '
-			print(string)
+		# else:
 
-def randstr(alphabet, size):
-	string = ''
-	for i in range(size):
-		string += alphabet[rr(len(alphabet))]
-	return string
+
+		# k = None
+		# for i in range(len(N)):
+
+
+		# for c in range(len(N)):
+		# 	if N[c] != None:
+		# 		j = N[c]
+
+		# if j != None:
+		# 	y = j
+		# else:
+		# 	y = self.history[len(self.history)-2]
+		# return y
+
 
 # create 10x10 grid of 0's
-grid = Grid(10, 10, 0)
+grid = Grid(9, 9, 0)
 
 # add random 1's to the grid
 for i in range(len(grid)):
 	for j in range(len(grid[i])):
-		if rr(10) < 2:
+		if rr(10) < 3:
 			grid[i][j] = 1
 
 # create graph
 graph = Graph()
 
-
 # add nodes to the graph from 1's in the grid
 for i in range(len(grid)):
 	for j in range(len(grid)):
 		if grid[i][j] == 1:
-			graph.set(randstr(LETTERS, 5), Point(j, i))
+			name = str(len(graph.keys()))
+			graph.set(name, PVector(j, i))
 
 # create links between nearby nodes
 for i in graph.keys():
@@ -65,17 +72,47 @@ for i in graph.keys():
 			if d <= 2:
 				graph.link(i, j)
 
-# add 4 operators to the graph
-graph.create('leftof rightof above below', 'operator')
-graph.set('leftof',LEFTOF)
-graph.set('rightof', RIGHTOF)
-graph.set('above', ABOVE)
-graph.set('below', BELOW)
+# add 2 operators to the graph
+graph.op('offx', OFFX)
+graph.op('offy', OFFY)
 
 # label links with operators
-graph.generate(['leftof', 'rightof', 'above', 'below'])
+ops = ['offx', 'offy']
+graph.generate(ops, 'function')
 
 # display model
-model = graph.model()
-print(model)
+grid.print()
+print()
 
+model = graph.model
+
+K = model.keys()
+i = K[0]
+Ki = model.neighbors(i)
+j = Ki[0]
+Yij = model.get(i, j)
+Yji = model.get(j, i)
+
+agent = ImageAgent(model)
+agent.set('1')
+
+x = i
+c = 0
+p = None
+
+done = False
+while not done:
+	x = agent.i
+	agent.update()
+
+	c += 1
+	if c > 100:
+		done = True
+	print(x, agent.V)
+
+
+
+# keys = Keys(model)
+# for i in Keys(model):
+# 	for j in model.neighbors(i):
+# 		print(i + ' ' + j + ' ' + str(model[i][j]))

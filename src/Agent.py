@@ -1,72 +1,93 @@
-from Graph import *
+from lib.util import Dict, Graph, Link, sort
 
-class Agent(Graph):
+class Agent:
 
-	def __init__(self):
-		super().__init__()
-		self.function = None
+	def compute_error(self, key):
+		return pow(len(self.history[key]) - len(self.children[key]), 2)
 
-	def interpret(self, string):
-		objects = parse(string, ['.'])
-		elements = []
-		for i in range(len(objects)):
-			objects[i] = parse(objects[i], ['/'])
-			if len(objects[i]) == 1:
-				objects[i] = objects[i][0]
-		return objects
-
-	def state(self, key, state):
-		self.set(merge(key, 'S', '.'), state)
-
-	def check(self, key):
-		return self.get(merge(key, 'S', '.'))
+	def compute_rating(self, key, depth):
+		error = self.compute_error(key)
+		if depth > 0 and len(self.children[key]) > 0:
+			for i in self.model.links(key):
+				error += self.compute_rating(i, depth-1)
+		return error
 	
-	def move(self, key):
-		return self.get(merge(key, 'N', '.'))
+	def __init__(self, model, thresh, depth):
+		self.place = None
+		self.thresh = thresh
+		self.depth = depth
+		self.model = model
+		self.log = list()
+		self.roots = list()
+		self.leaves = list()
+		self.children = Dict()
+		self.parents = Dict()
+		self.history = Dict()
+
+		for i in model.keys():
+			self.children[i] = model.links(i)
+			self.parents[i] = []
+			self.history[i] = []
+
+		for i in model.keys():
+			for j in model[i].keys():
+				if i not in self.parents[j]:
+					self.parents[j].append(i)
+
+		for i in self.children.keys():
+			if len(self.children[i]) == 0:
+				self.leaves.append(i)
+			if len(self.parents[i]) == 0:
+				self.roots.append(i)
 
 	def reset(self):
-		for i in self.get('nodes'):
-			self.set(i + '.S', False)
+		self.place = None
+		for i in self.history.keys():
+			self.history[i] = []
+		self.log = []
 
-	def construct(self, graph):
-		keys, links = unpack(graph)
-		self.arr('nodes', keys)
-		self.arr('links', links)
-
-		for i in range(len(keys)):
-			key = merge(keys[i], 'S', '.')
-			self.set(key, False)
-			key = merge(keys[i], 'N', '.')
-			self.arr(key, [])
-			if keys[i] in Keys(graph):
-				self.set(key, Keys(graph[keys[i]]))
-
-		for i in range(len(links)):
-			a,b,f = links[i]
-			key = merge(a, b, '/')
-			function = [[], 'total']
-			for j in f:
-				function[0].append([[a, b], j])
-			self.set(key, function, 'function')
-
-	def run(self, key, origin=True):
-		X = self.move(key)		
-		K = []
-		Y = []
-
-		for i in X:
-			s = self.check(i)
-			if s == False:
-				x = self.get(merge(key, i, '/'))
-				y = self.execute(x)
-				Y.append(y)
-				K.append(i)
-
-		for i in range(len(Y)):
-			if Y[i] == True: 
-				Y[i] = self.run(K[i], False)
-		if len(Y) == 0: y = 1
-		else: y = sum(Y)
+	def update(self, place):
+		if self.place != None:
+			if place not in self.history[self.place]:
+				self.history[self.place].append(place)
+		self.log.append(place)
+		self.place = place
 		
-		self.state(key, y)
-		return self.check(key)
+		i = place
+		Hi = self.history[i]
+		Pi = self.parents[i]
+		Ci = self.children[i]
+		Ri = Dict()
+
+		for j in range(len(Ci)):
+			c = Ci[j]
+			if c not in Hi:
+				e = self.compute_rating(c, self.depth)
+				if e > self.thresh:
+					Ri[c] = e
+		
+		if len(Ri) == 0:
+			if i not in self.roots:
+				y = self.log[len(self.log)-2]
+				del self.log[len(self.log)-1]
+			else:y = None		
+		else:
+			Ki = sort(Ri)
+			y = Ki[len(Ki)-1]
+		return y
+	
+	def run(self):
+		i = 0
+		x = None
+		done = False
+		while not done:
+			if x == None:
+				x = self.roots[i]
+			y = agent.update(x)
+			if y != None: x = y
+			else:
+				i += 1
+				x = None
+				if len(self.roots) == i:
+					done = True
+				else: x = self.roots[i]

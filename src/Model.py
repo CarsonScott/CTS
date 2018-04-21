@@ -1,11 +1,12 @@
 from Data import *
 
-class Graph(Data):
+class Model(Data):
 	
 	def __init__(self, directed=True):
 		super().__init__()
 		self.links = []
 		self.labels = []
+		self.model = None
 
 	def link(self, initial, final):
 		pair = [initial, final]
@@ -22,7 +23,6 @@ class Graph(Data):
 			for j in range(len(self.links[i])):
 				links[i].append(self.get(self.links[i][j]))
 		return links
-
 
 	def getlabels(self):
 		labels = []
@@ -52,7 +52,7 @@ class Graph(Data):
 					neighbors.append(self.links[i][0])
 		return neighbors
 	
-	def generate(self, operators):
+	def generate(self, operators, command):
 		opkeys = operators
 		ops = []
 		for i in range(len(opkeys)):
@@ -61,12 +61,29 @@ class Graph(Data):
 		outputs = []
 		for i in range(len(links)):
 			outputs.append(compute(links[i], ops))
+
 		for i in range(len(outputs)):
-			f = []
-			for j in range(len(outputs[i])):
-				if outputs[i][j] == True:
-					f.append(opkeys[j])
-			self.label(i, f)
+			self.label(i, outputs[i])
+
+		self.createmodel(operators, command)
+		
+	def createmodel(self, operators, command):
+		output = Graph()
+
+		for i in range(len(self.links)):
+			a, b = self.links[i]
+			if a not in output.keys():
+				output[a] = dict()
+
+			output[a][b] = []
+			for j in range(len(self.labels[i])):
+				if command == 'proposition':
+					if self.labels[i][j] == True:
+						output[a][b].append(operators[j])
+				elif command == 'function':
+					output[a][b].append(self.labels[i][j])
+		self.model = output
+
 	
 	def analyze(self):
 		labels = self.getlabels()
@@ -82,12 +99,4 @@ class Graph(Data):
 	def direct(self):
 		self.links = direct(self.links)
 
-	def model(self):
-		output = dict()
-		labels = self.analyze()
-		for i in range(len(self.links)):
-			a, b = self.links[i]
-			if a not in Keys(output):
-				output[a] = dict()
-			output[a][b] = labels[i]
-		return output
+	

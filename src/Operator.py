@@ -70,3 +70,31 @@ def ABOVE(X):
 def BELOW(X):
 	if len(X) < 2: raise Exception()
 	return X[0]['y'] > X[1]['y']
+def NEG(X):
+	for i in range(len(X)):
+		if X[i] >= 0: return False
+	return True
+def POS(X):
+	for i in range(len(X)):
+		if X[i] < 0: return False
+	return True
+def ALL(X):
+	for i in range(len(X)):
+		if X[i] != True:return False
+	return True
+def SOME(X):
+	for i in range(len(X)):
+		if X[i] == True:return True
+	return False
+def MEAN(X):
+	if len(X) == 0: return 0
+	return TOTAL(X) / len(X)
+def TOTAL(X):
+	y = 0
+	for i in range(len(X)):
+		if X[i]: y += 1
+	return y
+def OFFX(X):
+	return X[1]['x'] - X[0]['x']
+def OFFY(X):
+	return X[1]['y'] - X[0]['y']
